@@ -24,7 +24,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="bg-transparent">
           <Palette className="h-4 w-4 mr-2" />
-          {currentTemplate?.name}
+          {currentTemplate?.name || "Seleccionar plantilla"}
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>
@@ -33,7 +33,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange }: Templat
           <DropdownMenuItem
             key={template.id}
             onClick={() => onTemplateChange(template.id)}
-            className={selectedTemplate === template.id ? "bg-purple-50" : ""}
+            className={selectedTemplate === template.id ? "bg-purple-50 border-l-2 border-purple-500" : ""}
           >
             <div>
               <div className="font-medium">{template.name}</div>

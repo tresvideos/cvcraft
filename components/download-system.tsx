@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Download, FileText, File, FileImage, ChevronDown, Loader2, Check } from "lucide-react"
+import { Download, FileText, File, FileImage, Loader2, Check } from "lucide-react"
 import type { CVData } from "@/app/editor/cv/page"
 import { useSubscription } from "@/contexts/subscription-context"
 import { PaymentModal } from "@/components/payment-modal"
@@ -255,46 +255,21 @@ ${cvData.languages.map((lang) => `• ${lang.name} - ${lang.level}`).join("\n")}
     }
   }
 
-  const quickDownloadPDF = async () => {
-    if (!canDownload) {
-      setShowPaymentModal(true)
-      return
-    }
-    await handleDownload("pdf")
-  }
-
   return (
     <>
-      {/* Quick Download Button */}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={quickDownloadPDF}
-        disabled={isDownloading}
-        className="bg-transparent"
-      >
-        {isDownloading && downloadFormat === "pdf" ? (
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-        ) : (
-          <Download className="h-4 w-4 mr-2" />
-        )}
-        {canDownload ? "Descargar PDF" : "Descargar PDF (0,50€)"}
-      </Button>
-
       {/* Advanced Download Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm" className="bg-transparent">
             <Download className="h-4 w-4 mr-2" />
-            Más opciones
-            <ChevronDown className="h-4 w-4 ml-2" />
+            Descargar
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2">
               <Download className="h-5 w-5 text-purple-600" />
-              <span>Descargar CV</span>
+              <span>Selecciona el formato de descarga</span>
             </DialogTitle>
             <DialogDescription>Elige el formato que mejor se adapte a tus necesidades</DialogDescription>
           </DialogHeader>
@@ -317,6 +292,11 @@ ${cvData.languages.map((lang) => `• ${lang.name} - ${lang.level}`).join("\n")}
                       <div className="flex items-center space-x-2">
                         <h3 className="font-medium text-gray-900">{format.name}</h3>
                         {format.premium && <Badge variant="secondary">Pro</Badge>}
+                        {!canDownload && (
+                          <Badge variant="outline" className="text-green-600 border-green-600">
+                            €0,50
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-gray-600">{format.description}</p>
                     </div>
@@ -341,6 +321,20 @@ ${cvData.languages.map((lang) => `• ${lang.name} - ${lang.level}`).join("\n")}
               )
             })}
           </div>
+
+          {!canDownload && (
+            <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="flex items-start space-x-2">
+                <Download className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-amber-900">Descarga por €0,50</h4>
+                  <p className="text-sm text-amber-800 mt-1">
+                    Selecciona cualquier formato y procede al pago para descargar tu CV profesional.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <div className="flex items-start space-x-2">

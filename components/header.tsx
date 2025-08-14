@@ -104,7 +104,9 @@ export function Header() {
 
           {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-2">
-            <LanguageSelector />
+            <div className="relative z-[60]">
+              <LanguageSelector />
+            </div>
             <ThemeToggle />
 
             {user ? (
@@ -120,7 +122,7 @@ export function Header() {
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-56 z-[60]">
                   <div className="px-2 py-1.5 text-sm font-medium">
                     <p>{user.name}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
