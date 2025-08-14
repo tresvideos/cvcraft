@@ -49,7 +49,7 @@ export function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -104,7 +104,7 @@ export function Header() {
 
           {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-2">
-            <div className="relative z-[60]">
+            <div className="relative z-[10000]">
               <LanguageSelector />
             </div>
             <ThemeToggle />
@@ -122,7 +122,7 @@ export function Header() {
                     </div>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 z-[60]">
+                <DropdownMenuContent align="end" className="w-56 z-[10000]">
                   <div className="px-2 py-1.5 text-sm font-medium">
                     <p>{user.name}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
