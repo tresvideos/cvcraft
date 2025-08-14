@@ -21,56 +21,65 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-
-// Mock data for user's CVs and cover letters
-const mockCVs = [
-  {
-    id: "1",
-    title: "CV Desarrollador Frontend",
-    template: "Moderno",
-    lastModified: "2024-01-15",
-    downloads: 12,
-    status: "published",
-  },
-  {
-    id: "2",
-    title: "CV Marketing Digital",
-    template: "Profesional",
-    lastModified: "2024-01-10",
-    downloads: 8,
-    status: "draft",
-  },
-]
-
-const mockCoverLetters = [
-  {
-    id: "1",
-    title: "Carta para Google",
-    lastModified: "2024-01-12",
-    status: "published",
-  },
-]
+import { handleCancelSubscription } from "@/utils/subscription-utils" // Import handleCancelSubscription
 
 export default function DashboardPage() {
   const { user, loading } = useAuth()
-  const { subscription, cancelSubscription } = useSubscription()
+  const { subscription } = useSubscription()
   const router = useRouter()
 
-  const [cvs, setCvs] = useState(mockCVs)
+  const [cvs, setCvs] = useState([])
+  const [coverLetters, setCoverLetters] = useState([])
+  const [isLoadingData, setIsLoadingData] = useState(true)
   const [editingCv, setEditingCv] = useState(null)
   const [newTitle, setNewTitle] = useState("")
   const [previewCv, setPreviewCv] = useState(null)
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login")
+    if (user) {
+      loadUserData()
     }
-  }, [user, loading, router])
+  }, [user])
 
-  // Moved handleCancelSubscription function directly into component
-  const handleCancelSubscription = async () => {
-    if (confirm("¿Estás seguro de que quieres cancelar tu suscripción?")) {
-      await cancelSubscription()
+  const loadUserData = async () => {
+    try {
+      setIsLoadingData(true)
+
+      // Cargar CVs
+      const cvsResponse = await fetch("/api/cv")
+      if (cvsResponse.ok) {
+        const cvsData = await cvsResponse.json()
+        setCvs(cvsData.cvs || [])
+      }
+
+      // Cargar Cover Letters
+      const lettersResponse = await fetch("/api/cover-letter")
+      if (lettersResponse.ok) {
+        const lettersData = await lettersResponse.json()
+        setCoverLetters(lettersData.coverLetters || [])
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error)
+    } finally {
+      setIsLoadingData(false)
+    }
+  }
+
+  const handleDeleteCV = async (cvId) => {
+    if (confirm("¿Estás seguro de que quieres eliminar este CV?")) {
+      try {
+        const response = await fetch(`/api/cv/${cvId}`, {
+          method: "DELETE",
+        })
+
+        if (response.ok) {
+          setCvs(cvs.filter((cv) => cv.id !== cvId))
+        } else {
+          alert("Error al eliminar el CV")
+        }
+      } catch (error) {
+        alert("Error al eliminar el CV")
+      }
     }
   }
 
@@ -95,12 +104,6 @@ export default function DashboardPage() {
     setCvs(cvs.map((cv) => (cv.id === cvId ? { ...cv, title: newTitle } : cv)))
     setEditingCv(null)
     setNewTitle("")
-  }
-
-  const handleDeleteCV = (cvId) => {
-    if (confirm("¿Estás seguro de que quieres eliminar este CV?")) {
-      setCvs(cvs.filter((cv) => cv.id !== cvId))
-    }
   }
 
   const handleEditCV = (cvId) => {
@@ -176,7 +179,7 @@ export default function DashboardPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleCancelSubscription}
+                  onClick={() => handleCancelSubscription(user)}
                   className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 bg-transparent"
                 >
                   Cancelar Suscripción
@@ -193,7 +196,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">CVs Creados</p>
-                  <p className="text-2xl font-bold text-gray-900">{mockCVs.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{cvs.length}</p>
                 </div>
                 <FileText className="h-8 w-8 text-purple-600" />
               </div>
@@ -205,7 +208,7 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Cartas</p>
-                  <p className="text-2xl font-bold text-gray-900">{mockCoverLetters.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{coverLetters.length}</p>
                 </div>
                 <Mail className="h-8 w-8 text-purple-600" />
               </div>
@@ -422,7 +425,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockCoverLetters.map((letter) => (
+            {coverLetters.map((letter) => (
               <Card key={letter.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center justify-between">

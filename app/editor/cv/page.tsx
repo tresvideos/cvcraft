@@ -153,7 +153,14 @@ const templateMapping: Record<string, string> = {
 export default function CVEditorPage() {
   const searchParams = useSearchParams()
   const [cvData, setCVData] = useState<CVData>(initialCVData)
-  const [selectedTemplate, setSelectedTemplate] = useState("modern")
+  const [selectedTemplate, setSelectedTemplate] = useState(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search)
+      const templateId = urlParams.get("template")
+      return templateId && templateMapping[templateId] ? templateMapping[templateId] : "modern"
+    }
+    return "modern"
+  })
   const [showPreview, setShowPreview] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
 

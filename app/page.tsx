@@ -7,6 +7,7 @@ import { HowItWorksSection } from "@/components/how-it-works-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
 import { PricingSection } from "@/components/pricing-section"
 import { Footer } from "@/components/footer"
+import { ExamplesSection } from "@/components/examples-section"
 
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
         <TemplatesSection />
         <HowItWorksSection />
         <FeaturesSection />
+        <ExamplesSection />
         <TestimonialsSection />
         <PricingSection />
       </main>

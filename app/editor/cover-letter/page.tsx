@@ -66,9 +66,29 @@ export default function CoverLetterEditorPage() {
 
   const handleSave = async () => {
     setIsSaving(true)
-    // Simulate save operation
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsSaving(false)
+    try {
+      const response = await fetch("/api/cover-letter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: `Carta ${new Date().toLocaleDateString()}`,
+          data: coverLetterData,
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        alert("Carta guardada exitosamente")
+      } else {
+        throw new Error("Error al guardar")
+      }
+    } catch (error) {
+      alert("Error al guardar la carta")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
