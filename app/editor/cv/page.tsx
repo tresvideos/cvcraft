@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Header } from "@/components/header"
 import { AuthGuard } from "@/components/auth-guard"
 import { CVEditor } from "@/components/cv-editor"
@@ -138,11 +139,30 @@ const initialCVData: CVData = {
   awards: [],
 }
 
+const templateMapping: Record<string, string> = {
+  "1": "professional", // Ejecutivo Moderno
+  "2": "minimal", // Creativo Minimalista
+  "3": "modern", // Tech Innovador
+  "4": "professional", // Clásico Elegante
+  "5": "creative", // Startup Dinámico
+  "6": "professional", // Académico Formal
+  "7": "creative", // Marketing Creativo
+  "8": "professional", // Consultor Premium
+}
+
 export default function CVEditorPage() {
+  const searchParams = useSearchParams()
   const [cvData, setCVData] = useState<CVData>(initialCVData)
   const [selectedTemplate, setSelectedTemplate] = useState("modern")
   const [showPreview, setShowPreview] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+
+  useEffect(() => {
+    const templateId = searchParams.get("template")
+    if (templateId && templateMapping[templateId]) {
+      setSelectedTemplate(templateMapping[templateId])
+    }
+  }, [searchParams])
 
   const handleSave = async () => {
     setIsSaving(true)

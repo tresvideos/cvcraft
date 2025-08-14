@@ -5,9 +5,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { ChevronDown, Palette } from "lucide-react"
 
 const templates = [
-  { id: "modern", name: "Moderno", description: "Diseño limpio y contemporáneo" },
-  { id: "professional", name: "Profesional", description: "Clásico y elegante" },
-  { id: "creative", name: "Creativo", description: "Colorido y dinámico" },
+  { id: "modern", name: "Tech Innovador", description: "Diseño moderno para tecnología" },
+  { id: "professional", name: "Ejecutivo Profesional", description: "Clásico y elegante para ejecutivos" },
+  { id: "creative", name: "Creativo Dinámico", description: "Colorido y audaz para creativos" },
   { id: "minimal", name: "Minimalista", description: "Simple y efectivo" },
 ]
 
