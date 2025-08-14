@@ -24,10 +24,11 @@ import {
   BookOpen,
   Users,
   Trophy,
+  ChevronRight,
 } from "lucide-react"
 import { AIGenerator } from "@/components/ai-generator"
 import type { CVData } from "@/app/editor/cv/page"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 interface CVEditorProps {
   cvData: CVData
@@ -36,6 +37,7 @@ interface CVEditorProps {
 
 export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [activeTab, setActiveTab] = useState("personal")
 
   const updatePersonalInfo = (field: string, value: string) => {
     onDataChange({
@@ -388,9 +390,17 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
     })
   }
 
+  const goToNextTab = () => {
+    const tabs = ["personal", "experience", "education", "skills", "certifications", "projects", "languages", "more"]
+    const currentIndex = tabs.indexOf(activeTab)
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1])
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="personal" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="flex w-full overflow-x-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-1 gap-1 scrollbar-hide">
           <TabsTrigger
             value="personal"
@@ -610,6 +620,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </div>
             </CardContent>
           </Card>
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Experiencia
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="experience" className="space-y-6">
@@ -747,6 +763,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Educación
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="education" className="space-y-6">
@@ -866,6 +888,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Habilidades
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="skills" className="space-y-6">
@@ -931,6 +959,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Certificaciones
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="certifications" className="space-y-6">
@@ -1025,6 +1059,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Proyectos
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="projects" className="space-y-6">
@@ -1135,6 +1175,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Idiomas
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="languages" className="space-y-6">
@@ -1196,6 +1242,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
               </CardContent>
             </Card>
           )}
+          <div className="flex justify-end pt-4">
+            <Button onClick={goToNextTab} className="bg-purple-600 hover:bg-purple-700">
+              Siguiente paso: Más información
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
         <TabsContent value="more" className="space-y-6">
@@ -1462,6 +1514,12 @@ export function CVEditor({ cvData, onDataChange }: CVEditorProps) {
                 )}
               </CardContent>
             </Card>
+          </div>
+          <div className="flex justify-center pt-4">
+            <div className="text-center">
+              <p className="text-green-600 font-medium mb-2">¡CV completado!</p>
+              <p className="text-gray-600 text-sm">Ya puedes descargar tu curriculum desde el botón superior</p>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
