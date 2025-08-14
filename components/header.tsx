@@ -4,28 +4,33 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Sparkles, User, LogOut, Shield } from "lucide-react"
+import { Menu, X, Sparkles, User, LogOut, Shield, ChevronDown, Globe } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
-import { ThemeToggle, LanguageSelector } from "@/components/theme-controls"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ThemeToggle } from "@/components/theme-controls"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
   const { user, logout } = useAuth()
-  const { t } = useTheme()
+  const { t, language, setLanguage } = useTheme()
   const router = useRouter()
 
   const handleLogout = () => {
     logout()
     router.push("/")
+    setIsUserMenuOpen(false)
   }
+
+  const languages = [
+    { code: "es", name: "Español", flag: "🇪🇸" },
+    { code: "en", name: "English", flag: "🇺🇸" },
+    { code: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  ]
+
+  const currentLanguage = languages.find((lang) => lang.code === language) || languages[0]
 
   const navigationItems = [
     { href: "/templates", label: t("nav.templates"), icon: "📋" },
@@ -49,7 +54,7 @@ export function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-[9999] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
@@ -104,68 +109,126 @@ export function Header() {
 
           {/* Desktop Controls */}
           <div className="hidden md:flex items-center space-x-2">
-            <div className="relative z-[10000]">
-              <LanguageSelector />
+            <div className="relative">
+              <button
+                onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                className="flex items-center space-x-1 px-2 py-1 text-sm rounded-md hover:bg-muted transition-colors"
+              >
+                <Globe className="h-4 w-4" />
+                <span>{currentLanguage.flag}</span>
+                <span className="hidden sm:inline">{currentLanguage.code.toUpperCase()}</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+
+              {isLanguageMenuOpen && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-background border rounded-md shadow-lg z-[9999]">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code)
+                        setIsLanguageMenuOpen(false)
+                      }}
+                      className={`w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors ${
+                        language === lang.code ? "bg-muted" : ""
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                      {language === lang.code && <span className="ml-auto text-purple-600">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
             <ThemeToggle />
 
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 ml-2 hover:bg-muted">
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
-                    <div className="text-left hidden lg:block">
-                      <p className="text-sm font-medium">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 z-[10000]">
-                  <div className="px-2 py-1.5 text-sm font-medium">
-                    <p>{user.name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
-                    {user.role === "admin" && (
-                      <div className="flex items-center mt-1">
-                        <Shield className="h-3 w-3 text-orange-500 mr-1" />
-                        <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">Administrador</span>
-                      </div>
-                    )}
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 ml-2 px-2 py-1 rounded-md hover:bg-muted transition-colors"
+                >
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
                   </div>
-                  <DropdownMenuSeparator />
-                  {userNavigationItems.map((item) => (
-                    <DropdownMenuItem key={item.href} onClick={() => router.push(item.href)}>
-                      <span className="mr-2">{item.icon}</span>
-                      {item.label}
-                    </DropdownMenuItem>
-                  ))}
-                  {user.role === "admin" && (
-                    <>
-                      <DropdownMenuSeparator />
-                      {adminNavigationItems.map((item) => (
-                        <DropdownMenuItem
-                          key={item.href}
-                          onClick={() => router.push(item.href)}
-                          className="text-orange-600 dark:text-orange-400"
-                        >
-                          <span className="mr-2">{item.icon}</span>
-                          {item.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </>
-                  )}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push("/dashboard")}>
-                    <span className="mr-2">⚙️</span>
-                    Configuración
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {t("nav.logout")}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <div className="text-left hidden lg:block">
+                    <p className="text-sm font-medium">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-background border rounded-md shadow-lg z-[9999]">
+                    <div className="px-3 py-2 border-b">
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      {user.role === "admin" && (
+                        <div className="flex items-center mt-1">
+                          <Shield className="h-3 w-3 text-orange-500 mr-1" />
+                          <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                            Administrador
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {userNavigationItems.map((item) => (
+                      <button
+                        key={item.href}
+                        onClick={() => {
+                          router.push(item.href)
+                          setIsUserMenuOpen(false)
+                        }}
+                        className="w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left"
+                      >
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </button>
+                    ))}
+
+                    {user.role === "admin" && (
+                      <>
+                        <div className="border-t my-1"></div>
+                        {adminNavigationItems.map((item) => (
+                          <button
+                            key={item.href}
+                            onClick={() => {
+                              router.push(item.href)
+                              setIsUserMenuOpen(false)
+                            }}
+                            className="w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left text-orange-600 dark:text-orange-400"
+                          >
+                            <span>{item.icon}</span>
+                            <span>{item.label}</span>
+                          </button>
+                        ))}
+                      </>
+                    )}
+
+                    <div className="border-t my-1"></div>
+                    <button
+                      onClick={() => {
+                        router.push("/dashboard")
+                        setIsUserMenuOpen(false)
+                      }}
+                      className="w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left"
+                    >
+                      <span>⚙️</span>
+                      <span>Configuración</span>
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors text-left text-red-600 dark:text-red-400"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>{t("nav.logout")}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex items-center space-x-3 ml-2">
                 <Button variant="ghost" size="sm" asChild className="hover:bg-muted">
@@ -196,7 +259,36 @@ export function Header() {
           <div className="md:hidden border-t bg-background/95 backdrop-blur">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <div className="flex items-center justify-center space-x-4 px-3 py-3 border-b mb-2">
-                <LanguageSelector />
+                <div className="relative">
+                  <button
+                    onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+                    className="flex items-center space-x-1 px-2 py-1 text-sm rounded-md hover:bg-muted transition-colors"
+                  >
+                    <Globe className="h-4 w-4" />
+                    <span>{currentLanguage.flag}</span>
+                    <span>{currentLanguage.code.toUpperCase()}</span>
+                  </button>
+
+                  {isLanguageMenuOpen && (
+                    <div className="absolute left-0 top-full mt-1 w-32 bg-background border rounded-md shadow-lg z-[9999]">
+                      {languages.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setLanguage(lang.code)
+                            setIsLanguageMenuOpen(false)
+                          }}
+                          className={`w-full flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted transition-colors ${
+                            language === lang.code ? "bg-muted" : ""
+                          }`}
+                        >
+                          <span>{lang.flag}</span>
+                          <span>{lang.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <ThemeToggle />
               </div>
 
@@ -291,6 +383,16 @@ export function Header() {
           </div>
         )}
       </div>
+
+      {(isUserMenuOpen || isLanguageMenuOpen) && (
+        <div
+          className="fixed inset-0 z-[9998]"
+          onClick={() => {
+            setIsUserMenuOpen(false)
+            setIsLanguageMenuOpen(false)
+          }}
+        />
+      )}
     </header>
   )
 }
