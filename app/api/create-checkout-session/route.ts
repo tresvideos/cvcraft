@@ -1,12 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
-})
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+
+if (!stripeSecretKey) {
+  console.warn("STRIPE_SECRET_KEY not found in environment variables")
+}
+
+const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: "2024-06-20",
+    })
+  : null
 
 export async function POST(req: NextRequest) {
   try {
+    if (!stripe) {
+      return NextResponse.json(
+        {
+          error: "Stripe not configured. Please set STRIPE_SECRET_KEY in environment variables.",
+        },
+        { status: 500 },
+      )
+    }
+
     const { priceId, mode, trialPeriodDays, metadata } = await req.json()
 
     let customer

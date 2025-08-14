@@ -1,13 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { OAuth2Client } from "google-auth-library"
 
-const client = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  `${process.env.NEXTAUTH_URL}/api/auth/google/callback`,
-)
+function createGoogleClient() {
+  const clientId = process.env.GOOGLE_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET
+  const redirectUri = process.env.NEXTAUTH_URL
+
+  if (!clientId || !clientSecret || !redirectUri) {
+    return null
+  }
+
+  return new OAuth2Client(clientId, clientSecret, `${redirectUri}/api/auth/google/callback`)
+}
 
 export async function GET(req: NextRequest) {
+  const client = createGoogleClient()
+
+  if (!client) {
+    return NextResponse.redirect("/login?error=google_oauth_not_configured")
+  }
+
   const { searchParams } = new URL(req.url)
   const code = searchParams.get("code")
 
