@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Mail, Phone, MapPin, Globe, Linkedin, Github, Twitter, Award, BookOpen, Users, Trophy } from "lucide-react"
@@ -11,6 +12,12 @@ interface CVPreviewProps {
 }
 
 export function CVPreview({ cvData, template }: CVPreviewProps) {
+  const [currentTemplate, setCurrentTemplate] = useState(template)
+
+  useEffect(() => {
+    setCurrentTemplate(template)
+  }, [template])
+
   const renderEmptySection = (title: string, description: string) => (
     <div className="mb-6 opacity-50">
       <h2 className="text-xl font-sans font-semibold text-purple-600 mb-3">{title}</h2>
@@ -914,7 +921,7 @@ export function CVPreview({ cvData, template }: CVPreviewProps) {
   )
 
   const renderTemplate = () => {
-    switch (template) {
+    switch (currentTemplate) {
       case "modern":
         return renderModernTemplate()
       case "professional":
@@ -933,10 +940,10 @@ export function CVPreview({ cvData, template }: CVPreviewProps) {
       <CardContent className="p-0">
         <div className="bg-gray-100 p-4 border-b">
           <h3 className="font-sans font-semibold text-gray-900">Vista Previa</h3>
-          <p className="text-sm text-gray-600">Plantilla: {template}</p>
+          <p className="text-sm text-gray-600">Plantilla: {currentTemplate}</p>
         </div>
         <div className="max-h-[800px] overflow-y-auto">
-          <div key={template}>{renderTemplate()}</div>
+          <div key={`template-${currentTemplate}-${Date.now()}`}>{renderTemplate()}</div>
         </div>
       </CardContent>
     </Card>
